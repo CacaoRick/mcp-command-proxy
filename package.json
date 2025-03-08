@@ -1,6 +1,6 @@
 {
   "name": "mcp-command-proxy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server that proxies CLI commands and collects logs",
   "type": "module",
   "main": "dist/index.js",

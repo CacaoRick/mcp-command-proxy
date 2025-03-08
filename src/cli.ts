@@ -98,9 +98,7 @@ Connect your MCP client to these endpoints.
 }
 
 // Only run main if this is the entry point
-if (import.meta.url === process.argv[1]) {
-  main().catch(error => {
-    console.error('Unhandled error:', error);
-    process.exit(1);
-  });
-} 
+main().catch(error => {
+  console.error('Unhandled error:', error);
+  process.exit(1);
+}); 
