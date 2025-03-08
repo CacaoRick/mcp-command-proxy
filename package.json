@@ -1,0 +1,107 @@
+{
+  "name": "mcp-command-proxy",
+  "version": "1.0.0",
+  "description": "MCP server that proxies CLI commands and collects logs",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mcp-command-proxy": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node --esm src/cli.ts",
+    "test": "jest",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepublishOnly": "npm run build",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "cli",
+    "proxy",
+    "logs",
+    "expo",
+    "model-context-protocol"
+  ],
+  "author": "Hormold",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hormold/mcp-command-proxy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hormold/mcp-command-proxy/issues"
+  },
+  "homepage": "https://github.com/hormold/mcp-command-proxy#readme",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.4",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "eslint": "^8.55.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.1.0",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "express": "^4.21.2",
+    "node-pty": "^1.0.0",
+    "zod": "^3.24.2"
+  },
+  "mcp": {
+    "name": "Command Proxy",
+    "description": "MCP server that proxies CLI commands and collects logs",
+    "transportType": "sse",
+    "sse": {
+      "endpoint": "/sse",
+      "messagesEndpoint": "/messages"
+    },
+    "capabilities": {
+      "resources": true,
+      "tools": true
+    },
+    "tools": [
+      {
+        "name": "getRecentLogs",
+        "description": "Get the most recent logs from the running command",
+        "parameters": {
+          "limit": "number?",
+          "types": "string[]?"
+        }
+      },
+      {
+        "name": "sendKeyPress",
+        "description": "Send a key press to the running command",
+        "parameters": {
+          "key": "string"
+        }
+      },
+      {
+        "name": "getProcessStatus",
+        "description": "Get the current status of the running command",
+        "parameters": {}
+      }
+    ],
+    "resources": [
+      {
+        "name": "server-info",
+        "description": "Information about the server and available tools",
+        "uri": "server://info"
+      }
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ]
+}
