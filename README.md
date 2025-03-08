@@ -2,6 +2,23 @@
 
 An MCP (Model Context Protocol) server that acts as a proxy for CLI commands, specifically designed for Expo development but adaptable for any command-line application.
 
+## How to use in Cursor (Expo example)
+
+1. Go to the directory of your Expo project
+2. Run `npx mcp-command-proxy --prefix "ExpoServer" --command "expo start" --port 8383`
+3. Go to Cursor settings -> MCP -> +Add new MCP server, like this:  
+![add_mcp_server](guide/add_mcp.png)
+4. Set the name to "ExpoServer", Type to "SSE", URL to `http://localhost:8383/sse`
+5. Click "Save" and you should now be able to use the MCP server in Cursor. Like this:
+![mcp_server_in_cursor](guide/result.png)
+
+Recommended to use the `--port 8383` flag to avoid conflicts with other servers.
+Also, you can add following instruction to .cursorrules file:
+```
+You can use MCP getRecentLogs tool to get the most recent logs from Expo server. And if needed, you can send key presses to the running process using sendKeyPress tool.
+```
+
+
 ## Features
 
 - **Command Proxying**: Run any CLI command through the MCP server
