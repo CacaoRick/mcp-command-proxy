@@ -12,6 +12,9 @@ import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import { z } from 'zod';
 import { CommandRunner, ProcessStatus, LogEntry } from './utils/command-runner.js';
 
+// session id to transport map
+const activeTransports = new Map<string, SSEServerTransport>();
+
 /**
  * Create an MCP server for proxying CLI commands
  */
@@ -162,20 +165,37 @@ export async function createServer(options: {
       };
     }
   );
-  let transport: SSEServerTransport;
   
   // Set up SSE endpoint
   app.get("/sse", async (req, res) => {
     console.log(`[${prefix}] SSE endpoint connected`);
-    if(!transport) {
-      transport = new SSEServerTransport("/messages", res);
-    }
-    await server.connect(transport);
+    const currentConnectionTransport = new SSEServerTransport("/messages", res); 
+    activeTransports.set(currentConnectionTransport.sessionId, currentConnectionTransport);
+    await server.connect(currentConnectionTransport);
+
+    // Handle client disconnect for this specific connection
+    req.on('close', () => {
+      console.log(`[${prefix}] SSE endpoint disconnected for session: ${currentConnectionTransport.sessionId}`);
+      // Remove the transport from the map when the connection closes
+      if (activeTransports.has(currentConnectionTransport.sessionId)) {
+        activeTransports.get(currentConnectionTransport.sessionId)?.close(); // Close only if it's still in the map
+        activeTransports.delete(currentConnectionTransport.sessionId);
+      }
+    });
   });
+  
 
   app.post("/messages", async (req, res) => {
-    await transport.handlePostMessage(req, res);
-    console.log(`[${prefix}] Message received:`, req.body);
+    const sessionId = req.query.sessionId as string;
+    const transport = activeTransports.get(sessionId);
+
+    if (transport) {
+      await transport.handlePostMessage(req, res, req.body); // Pass req.body as well
+      console.log(`[${prefix}] Message received for session ${sessionId}:`, req.body);
+    } else {
+      res.status(400).send('No active SSE connection found for this session.');
+      console.warn(`[${prefix}] No active SSE connection found for session ID: ${sessionId} for POST message.`);
+    }
   });
     
   // Setup raw mode for stdin
