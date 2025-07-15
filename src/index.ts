@@ -23,7 +23,7 @@ export async function createServer(options: {
   command: string;
   bufferSize?: number;
   port: number;
-}) {
+}): Promise<{ stop: () => void }> {
   const { prefix, command, bufferSize = 300, port } = options;
   
   // Create Express app
@@ -258,7 +258,7 @@ export async function createServer(options: {
   
   // Return a stop function
   return {
-    stop: () => {
+    stop: (): void => {
       commandRunner.stop();
       server_instance.close();
       console.log(`[${prefix}] MCP server stopped`);
